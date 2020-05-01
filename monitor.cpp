@@ -18,19 +18,18 @@
 //
 //*********************************************
 
-#include <iostream>
-#include <string>
-#include <memory>
-#include <stdexcept>
-#include <array>
-
-#include <glibtop.h>
+#include <boost/algorithm/string.hpp>
 #include <glibtop/mem.h>
 #include <glibtop/swap.h>
 
-#include <boost/algorithm/string.hpp>
-		   
-#define GB 1073745920 //GiB -> GB
+#include <array>
+#include <glibtop.h>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <string>
+
+#define GB 1073745920  //GiB -> GB
 #define MB 1048576     //MiB -> MB
 
 static void showUsage(std::string);
@@ -39,120 +38,110 @@ int getRamPer(void);
 int getSwap(void);
 int getSwaper(void);
 int getIp(void);
-std::string exec(const char*);
+std::string exec(const char *);
 
-int main(int argc, char * argv[])
-{
-	if(argc <= 1){
-		showUsage(argv[0]);
-	} 
-	else {
-		std::string arg;
-		arg = argv[1];
-		if(arg=="--ram"){
-			getRam();
-		}
-		else if(arg=="--ramuse"){
-			getRamPer();
-		}
-		else if(arg=="--swap"){
-			getSwap();
-		}
-		else if(arg=="--swapuse"){
-			getSwaper();
-		}
-		else if(arg=="--extip"){
-			getIp();
-		}
-	}
+int main(int argc, char *argv[]) {
+    if (argc <= 1) {
+        showUsage(argv[0]);
+    } else {
+        std::string arg;
+        arg = argv[1];
+        if (arg == "--ram") {
+            getRam();
+        } else if (arg == "--ramuse") {
+            getRamPer();
+        } else if (arg == "--swap") {
+            getSwap();
+        } else if (arg == "--swapuse") {
+            getSwaper();
+        } else if (arg == "--extip") {
+            getIp();
+        }
+    }
     return 0;
 }
 
-
-static void showUsage(std::string name){
+static void showUsage(std::string name) {
     std::cerr << "Usage: " << name << " <option>\n"
               << "Options:\n"
               << "\t--ram \t\tShow total ram info\n"
               << "\t--ramuse \tShow percentual ram in use\n"
-			  << "\t--swap \t\tShow swap info\n"
-			  << "\t--swapuse \tShow percentual swap in use\n"
-			  << "\t--extip \tShow external IP address\n"
+              << "\t--swap \t\tShow swap info\n"
+              << "\t--swapuse \tShow percentual swap in use\n"
+              << "\t--extip \tShow external IP address\n"
               << std::endl;
 }
 
-int getRam(void){
-	glibtop_init();
-	glibtop_mem mem;
-	glibtop_get_mem(&mem);
+int getRam(void) {
+    glibtop_init();
+    glibtop_mem mem;
+    glibtop_get_mem(&mem);
 
-	float util;
-	util = (float)(mem.used - mem.cached - mem.buffer);
+    float util;
+    util = (float)(mem.used - mem.cached - mem.buffer);
 
-	if((util/GB) < 1){
-		std::cout.precision(3);
-		std::cout << util/MB <<"MB / " << (float)mem.total/GB <<"GB\n";
-	}
-	else{
-		std::cout.precision(3);
-		std::cout << util/GB <<"GB / " << (float)mem.total/GB <<"GB\n";
-	}
+    if ((util / GB) < 1) {
+        std::cout.precision(3);
+        std::cout << util / MB << "MB / " << (float)mem.total / GB << "GB\n";
+    } else {
+        std::cout.precision(3);
+        std::cout << util / GB << "GB / " << (float)mem.total / GB << "GB\n";
+    }
 
-	return 0;
+    return 0;
 }
 
+int getRamPer(void) {
+    glibtop_init();
+    glibtop_mem mem;
+    glibtop_get_mem(&mem);
 
-int getRamPer(void){
-	glibtop_init();
-	glibtop_mem mem;
-	glibtop_get_mem(&mem);
+    float memperc;
 
-	float memperc;
+    memperc = 100 * (float)(mem.used - mem.buffer - mem.cached) / mem.total;
 
-	memperc = 100*(float)(mem.used - mem.buffer - mem.cached)/mem.total;
+    std::cout.precision(3);
+    std::cout << memperc << "%\n";
 
-	std::cout.precision(3);
-	std::cout << memperc <<"%\n";
-
-	return 0;
+    return 0;
 }
 
-int getSwap(void){
-	glibtop_init();
-	glibtop_swap swap;
-	glibtop_get_swap(&swap);
+int getSwap(void) {
+    glibtop_init();
+    glibtop_swap swap;
+    glibtop_get_swap(&swap);
 
-	if(((float)swap.used/GB) < 1){
-		std::cout.precision(3);
-		std::cout << (float)swap.used/MB <<"MB / " << (float)swap.total/GB <<"GB\n";
-	}
-	else{
-		std::cout.precision(3);
-		std::cout << (float)swap.used/GB <<"GB / " << (float)swap.total/GB <<"GB\n";
-	}
+    if (((float)swap.used / GB) < 1) {
+        std::cout.precision(3);
+        std::cout << (float)swap.used / MB << "MB / " << (float)swap.total / GB << "GB\n";
+    } else {
+        std::cout.precision(3);
+        std::cout << (float)swap.used / GB << "GB / " << (float)swap.total / GB << "GB\n";
+    }
 
-	return 0;
+    return 0;
 }
 
-int getSwaper(void){
-	glibtop_init();
-	glibtop_swap swap;
-	glibtop_get_swap(&swap);
+int getSwaper(void) {
+    glibtop_init();
+    glibtop_swap swap;
+    glibtop_get_swap(&swap);
 
-	std::cout.precision(3);
-	std::cout << 100*(float)(swap.used)/swap.total <<"%\n";
+    std::cout.precision(3);
+    std::cout << 100 * (float)(swap.used) / swap.total << "%\n";
 
-	return 0;
+    return 0;
 }
 
-int getIp(void){
-	std::string ip;
-	ip = exec("dig TXT +short o-o.myaddr.l.google.com @ns1.google.com");
-	boost::erase_all(ip, "\"");
-	std::cout << ip;
-	return 0;
+int getIp(void) {
+    std::string ip;
+    ip = exec("dig TXT +short o-o.myaddr.l.google.com @ns1.google.com");
+    boost::erase_all(ip, "\"");
+    std::cout << ip;
+    return 0;
 }
 
-std::string exec(const char* cmd) {
+std::string exec(const char *cmd) {
     std::array<char, 128> buffer;
     std::string result;
     std::unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd, "r"), pclose);
